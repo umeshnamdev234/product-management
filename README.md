@@ -158,7 +158,7 @@ mvn -version
 ## Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/umeshnamdev234/product-management.git
 cd product-management
 ```
 

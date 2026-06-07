@@ -10,11 +10,6 @@ services:
       POSTGRES_DB: product_management
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      JWT_SECRET: mysecretkeymysecretkeymysecretkeymysecretkey
-      SPRING_JPA_SHOW_SQL: false
-      LOGGING_LEVEL_ORG_HIBERNATE: ERROR
-      LOGGING_LEVEL_ORG_HIBERNATE_SQL: OFF
-      LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: OFF
 
     ports:
       - "5432:5432"
@@ -44,6 +39,27 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       JWT_SECRET: mysecretkeymysecretkeymysecretkeymysecretkey
+
+      SPRING_JPA_SHOW_SQL: false
+      LOGGING_LEVEL_ORG_HIBERNATE: ERROR
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: OFF
+      LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: OFF
+
+  test:
+    build: .
+    container_name: product-api-test
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/product_management
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: mysecretkeymysecretkeymysecretkeymysecretkey
+
+    command: ["./mvnw", "test"]
 
 volumes:
   postgres_data:

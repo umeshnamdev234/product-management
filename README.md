@@ -1,6 +1,6 @@
 # Product Management API
 
-A Spring Boot REST API for Product Management with JWT Authentication and Role-Based Authorization.
+A Spring Boot REST API for Product Management with JWT Authentication, Role-Based Authorization, PostgreSQL, and Docker support.
 
 ## Features
 
@@ -31,6 +31,12 @@ A Spring Boot REST API for Product Management with JWT Authentication and Role-B
 * Mockito for mocking dependencies
 * MockMvc for controller testing
 
+### Docker Support
+
+* Dockerized Spring Boot application
+* PostgreSQL container
+* One-command startup using Docker Compose
+
 ---
 
 # Technology Stack
@@ -41,10 +47,12 @@ A Spring Boot REST API for Product Management with JWT Authentication and Role-B
 | Spring Boot     | 3.x     |
 | Spring Security | 6.x     |
 | Spring Data JPA | 3.x     |
-| H2 Database     | Latest  |
+| PostgreSQL      | 16      |
 | JWT (JJWT)      | Latest  |
 | Lombok          | Latest  |
 | Maven           | 3.x     |
+| Docker          | Latest  |
+| Docker Compose  | Latest  |
 | JUnit 5         | Latest  |
 | Mockito         | Latest  |
 
@@ -53,6 +61,14 @@ A Spring Boot REST API for Product Management with JWT Authentication and Role-B
 # Project Structure
 
 ```text
+product-management
+│
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── pom.xml
+├── README.md
+│
 src
 ├── main
 │   ├── java
@@ -93,6 +109,9 @@ src
 │   │           ├── service
 │   │           │   ├── AuthService.java
 │   │           │   └── ProductService.java
+│   │           │
+│   │           ├── seed
+│   │           │   └── DataSeeder.java
 │   │           │
 │   │           └── ProductManagementApplication.java
 │   │
@@ -145,6 +164,7 @@ Install:
 
 * Java 21
 * Maven 3.9+
+* PostgreSQL 16
 
 Verify installation:
 
@@ -195,6 +215,135 @@ Application starts on:
 ```text
 http://localhost:8080
 ```
+
+---
+
+# Docker Setup
+
+## Prerequisites
+
+Install:
+
+* Docker
+* Docker Compose
+
+Verify installation:
+
+```bash
+docker --version
+docker compose version
+```
+
+---
+
+## Run Application with Docker
+
+Build and start PostgreSQL and Spring Boot application:
+
+```bash
+docker compose up --build
+```
+
+Run in background:
+
+```bash
+docker compose up -d --build
+```
+
+Application:
+
+```text
+http://localhost:8080
+```
+
+Database:
+
+```text
+Host: localhost
+Port: 5432
+Database: product_management
+Username: postgres
+Password: postgres
+```
+
+---
+
+## Stop Containers
+
+```bash
+docker compose down
+```
+
+Remove containers and database volume:
+
+```bash
+docker compose down -v
+```
+
+---
+
+## View Logs
+
+Application logs:
+
+```bash
+docker compose logs -f app
+```
+
+Database logs:
+
+```bash
+docker compose logs -f postgres
+```
+
+---
+
+## Rebuild Containers
+
+```bash
+docker compose up --build
+```
+
+or
+
+```bash
+docker compose build
+docker compose up
+```
+
+---
+
+# Docker Files
+
+| File               | Purpose                                        |
+| ------------------ | ---------------------------------------------- |
+| Dockerfile         | Builds Spring Boot application image           |
+| docker-compose.yml | Starts PostgreSQL and Spring Boot containers   |
+| .dockerignore      | Excludes unnecessary files during Docker build |
+
+---
+
+# Default Seeded Users
+
+The application automatically creates default users during startup if they do not already exist.
+
+| Username | Password  | Role |
+| -------- | --------- | ---- |
+| admin    | admin123  | EDIT |
+| viewer   | viewer123 | VIEW |
+
+### Permissions
+
+#### EDIT
+
+* View Products
+* Create Products
+* Update Products
+* Delete Products
+
+#### VIEW
+
+* View Products only
 
 ---
 
@@ -272,7 +421,7 @@ GET /products
 
 ---
 
-## Get Product By Id
+## Get Product By ID
 
 ```http
 GET /products/{id}
@@ -298,6 +447,8 @@ DELETE /products/{id}
 
 # Running Tests
 
+## Run Tests Locally
+
 Run all tests:
 
 ```bash
@@ -316,10 +467,42 @@ Run controller tests:
 mvn test -Dtest=ProductControllerTest
 ```
 
-Generate detailed test logs:
+Generate detailed logs:
 
 ```bash
 mvn test -X
+```
+
+---
+
+## Run Tests Inside Docker
+
+Run all tests:
+
+```bash
+docker run --rm -v "$(pwd)":/app -w /app maven:3.9.9-eclipse-temurin-21 mvn test
+```
+
+Run specific tests:
+
+```bash
+docker run --rm -v "$(pwd)":/app -w /app maven:3.9.9-eclipse-temurin-21 mvn test -Dtest=ProductServiceTest
+```
+
+---
+
+## Build and Verify
+
+Local:
+
+```bash
+mvn clean verify
+```
+
+Docker:
+
+```bash
+docker run --rm -v "$(pwd)":/app -w /app maven:3.9.9-eclipse-temurin-21 mvn clean verify
 ```
 
 ---
@@ -399,21 +582,6 @@ SecurityContext
    v
 Protected APIs
 ```
-
----
-
-# Future Improvements
-
-* Refresh Token Support
-* Swagger / OpenAPI Documentation
-* Docker Support
-* Pagination & Sorting
-* Product Search API
-* Audit Logging
-* PostgreSQL/MySQL Integration
-* Integration Tests
-* Test Coverage Reporting
-
 ---
 
 # Author

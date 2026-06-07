@@ -2,6 +2,35 @@
 
 A Spring Boot REST API for Product Management with JWT Authentication, Role-Based Authorization, PostgreSQL, and Docker support.
 
+## Quick Start
+
+### Run with Docker (Recommended)
+
+```bash
+docker compose up -d --build
+```
+
+Application:
+
+```text
+http://localhost:8080
+```
+
+### Run Locally
+
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+
+Application:
+
+```text
+http://localhost:8080
+```
+
+---
+
 ## Features
 
 ### Authentication & Authorization
@@ -76,7 +105,8 @@ src
 │   │       └── product_management
 │   │
 │   │           ├── config
-│   │           │   └── SecurityConfig.java
+│   │           │   ├── SecurityConfig.java
+│   │           │   └── DataSeeder.java
 │   │           │
 │   │           ├── controller
 │   │           │   ├── AuthController.java
@@ -110,9 +140,6 @@ src
 │   │           │   ├── AuthService.java
 │   │           │   └── ProductService.java
 │   │           │
-│   │           ├── seed
-│   │           │   └── DataSeeder.java
-│   │           │
 │   │           └── ProductManagementApplication.java
 │   │
 │   └── resources
@@ -124,14 +151,11 @@ src
             └── product_management
                 ├── controller
                 │   └── ProductControllerTest.java
-                │
                 ├── exception
                 │   └── GlobalExceptionHandlerTest.java
-                │
                 ├── service
                 │   ├── AuthServiceTest.java
                 │   └── ProductServiceTest.java
-                │
                 └── ProductManagementApplicationTests.java
 ```
 
@@ -143,16 +167,6 @@ src
 | ---- | ------------------------------------- |
 | VIEW | Read Products                         |
 | EDIT | Read, Create, Update, Delete Products |
-
-### Product APIs
-
-| Endpoint              | Permission  |
-| --------------------- | ----------- |
-| GET /products         | VIEW / EDIT |
-| GET /products/{id}    | VIEW / EDIT |
-| POST /products        | EDIT        |
-| PUT /products/{id}    | EDIT        |
-| DELETE /products/{id} | EDIT        |
 
 ---
 
@@ -188,12 +202,6 @@ cd product-management
 
 ```bash
 mvn clean install
-```
-
-Successful build:
-
-```text
-BUILD SUCCESS
 ```
 
 ---
@@ -298,31 +306,6 @@ docker compose logs -f postgres
 
 ---
 
-## Rebuild Containers
-
-```bash
-docker compose up --build
-```
-
-or
-
-```bash
-docker compose build
-docker compose up
-```
-
----
-
-# Docker Files
-
-| File               | Purpose                                        |
-| ------------------ | ---------------------------------------------- |
-| Dockerfile         | Builds Spring Boot application image           |
-| docker-compose.yml | Starts PostgreSQL and Spring Boot containers   |
-| .dockerignore      | Excludes unnecessary files during Docker build |
-
----
-
 # Default Seeded Users
 
 The application automatically creates default users during startup if they do not already exist.
@@ -332,16 +315,14 @@ The application automatically creates default users during startup if they do no
 | admin    | admin123  | EDIT |
 | viewer   | viewer123 | VIEW |
 
-### Permissions
-
-#### EDIT
+### EDIT
 
 * View Products
 * Create Products
 * Update Products
 * Delete Products
 
-#### VIEW
+### VIEW
 
 * View Products only
 
@@ -349,19 +330,15 @@ The application automatically creates default users during startup if they do no
 
 # Authentication
 
-## Login Request
+## Login as Admin
 
-```http
-POST /auth/login
-```
-
-Request:
-
-```json
-{
+```bash
+curl --location 'http://localhost:8080/auth/login' \
+--header 'Content-Type: application/json' \
+--data '{
   "username": "admin",
   "password": "admin123"
-}
+}'
 ```
 
 Response:
@@ -372,75 +349,86 @@ Response:
 }
 ```
 
----
+Save token:
 
-# Using JWT Token
-
-Include JWT token in Authorization header:
-
-```http
-Authorization: Bearer <JWT_TOKEN>
+```bash
+TOKEN=<JWT_TOKEN>
 ```
 
-Example:
+---
 
-```http
-GET /products
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+## Login as Viewer
+
+```bash
+curl --location 'http://localhost:8080/auth/login' \
+--header 'Content-Type: application/json' \
+--data '{
+  "username": "viewer",
+  "password": "viewer123"
+}'
 ```
 
 ---
 
 # Product APIs
 
-## Create Product
+## Create Product (EDIT Role)
 
-```http
-POST /products
-```
-
-Request:
-
-```json
-{
+```bash
+curl --location 'http://localhost:8080/products' \
+--header "Authorization: Bearer $TOKEN" \
+--header 'Content-Type: application/json' \
+--data '{
   "name": "Men Shirt",
   "description": "Cotton Shirt",
   "price": 499.99,
   "quantity": 20,
-  "imageUrl": "https://example.com/image.jpg"
-}
+  "imageUrl": "https://example.com/shirt.jpg"
+}'
 ```
 
 ---
 
-## Get All Products
+## Get All Products (VIEW / EDIT Role)
 
-```http
-GET /products
+```bash
+curl --location 'http://localhost:8080/products' \
+--header "Authorization: Bearer $TOKEN"
 ```
 
 ---
 
-## Get Product By ID
+## Get Product By ID (VIEW / EDIT Role)
 
-```http
-GET /products/{id}
+```bash
+curl --location 'http://localhost:8080/products/{productId}' \
+--header "Authorization: Bearer $TOKEN"
 ```
 
 ---
 
-## Update Product
+## Update Product (EDIT Role)
 
-```http
-PUT /products/{id}
+```bash
+curl --location --request PUT 'http://localhost:8080/products/{productId}' \
+--header "Authorization: Bearer $TOKEN" \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "Updated Shirt",
+  "description": "Premium Cotton Shirt",
+  "price": 699.99,
+  "quantity": 15,
+  "imageUrl": "https://example.com/updated-shirt.jpg"
+}'
 ```
 
 ---
 
-## Delete Product
+## Delete Product (EDIT Role)
 
-```http
-DELETE /products/{id}
+```bash
+curl --location --request DELETE 'http://localhost:8080/products/{productId}' \
+--header "Authorization: Bearer $TOKEN"
 ```
 
 ---
@@ -507,32 +495,7 @@ docker run --rm -v "$(pwd)":/app -w /app maven:3.9.9-eclipse-temurin-21 mvn clea
 
 ---
 
-# Test Coverage
-
-The project includes tests for:
-
-### Service Layer
-
-* ProductService
-* AuthService
-
-### Controller Layer
-
-* ProductController
-
-### Exception Handling
-
-* GlobalExceptionHandler
-
-### Application Context
-
-* Spring Boot startup validation
-
----
-
 # Error Response Format
-
-Example:
 
 ```json
 {
@@ -541,7 +504,7 @@ Example:
 }
 ```
 
-Validation Example:
+Validation example:
 
 ```json
 {
@@ -553,35 +516,6 @@ Validation Example:
 }
 ```
 
----
-
-# Security Flow
-
-```text
-Client
-   |
-   | Login
-   v
-AuthController
-   |
-   v
-AuthService
-   |
-   v
-JWT Token Generated
-   |
-   v
-Client sends JWT
-   |
-   v
-JwtAuthenticationFilter
-   |
-   v
-SecurityContext
-   |
-   v
-Protected APIs
-```
 ---
 
 # Author

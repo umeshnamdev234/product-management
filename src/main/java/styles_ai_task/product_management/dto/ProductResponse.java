@@ -36,28 +36,13 @@ public class ProductResponse {
      */
     private UUID id;
 
-    /**
-     * Product name.
-     */
     private String name;
 
-    /**
-     * Product description.
-     */
     private String description;
 
-    /**
-     * Product price.
-     */
     private BigDecimal price;
 
-    /**
-     * Available stock quantity.
-     */
     private Integer quantity;
 
-    /**
-     * Product image URL.
-     */
     private String imageUrl;
 }

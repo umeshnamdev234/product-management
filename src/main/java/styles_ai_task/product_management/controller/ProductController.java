@@ -2,14 +2,17 @@ package styles_ai_task.product_management.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import styles_ai_task.product_management.dto.PaginatedResponse;
 import styles_ai_task.product_management.dto.ProductRequest;
 import styles_ai_task.product_management.entity.Product;
 import styles_ai_task.product_management.service.ProductService;
 
-import java.util.List;
+//import java.util.List;
 import java.util.UUID;
 
 /**
@@ -53,9 +56,14 @@ public class ProductController {
      */
     @PreAuthorize("hasAuthority('VIEW') or hasAuthority('EDIT')")
     @GetMapping
-    public List<Product> getProducts() {
+    public ResponseEntity<PaginatedResponse<Product>> getAllProducts(
+            @RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "10") int pageSize) {
 
-        return productService.getAllProducts();
+        return ResponseEntity.ok(
+                productService.getAllProducts(
+                        pageNumber,
+                        pageSize));
     }
 
     /**
@@ -96,11 +104,11 @@ public class ProductController {
      *
      * Sample Request:
      * {
-     *   "name": "Male Shirt",
-     *   "description": "Cotton shirt",
-     *   "price": 999.99,
-     *   "quantity": 10,
-     *   "imageUrl": "https://example.com/shirt.jpg"
+     * "name": "Male Shirt",
+     * "description": "Cotton shirt",
+     * "price": 999.99,
+     * "quantity": 10,
+     * "imageUrl": "https://example.com/shirt.jpg"
      * }
      *
      * @param request Product creation request.
@@ -126,7 +134,7 @@ public class ProductController {
      * Validation:
      * Request body is validated before processing.
      *
-     * @param id Product identifier.
+     * @param id      Product identifier.
      * @param request Updated product information.
      * @return Updated product.
      */

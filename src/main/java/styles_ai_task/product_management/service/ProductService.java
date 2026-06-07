@@ -6,9 +6,14 @@ import styles_ai_task.product_management.exception.BusinessException;
 import styles_ai_task.product_management.repository.ProductRepository;
 import styles_ai_task.product_management.exception.ErrorCodes;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import styles_ai_task.product_management.dto.PaginatedResponse;
+
+//import java.util.List;
 import java.util.UUID;
 
 /**
@@ -40,8 +45,23 @@ public class ProductService {
      *
      * @return list of all available products
      */
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public PaginatedResponse<Product> getAllProducts(
+            int pageNumber,
+            int pageSize) {
+
+        Pageable pageable = PageRequest.of(
+                Math.max(pageNumber - 1, 0),
+                pageSize);
+
+        Page<Product> page = productRepository.findAll(pageable);
+
+        return PaginatedResponse.<Product>builder()
+                .data(page.getContent())
+                .totalRecords(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .build();
     }
 
     /**
@@ -95,7 +115,7 @@ public class ProductService {
      * 2. Update product fields.
      * 3. Save updated product.
      *
-     * @param id product identifier
+     * @param id      product identifier
      * @param request updated product data
      * @return updated product entity
      * @throws BusinessException when product does not exist

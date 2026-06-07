@@ -392,11 +392,10 @@ curl --location 'http://localhost:8080/products' \
 ## Get All Products (VIEW / EDIT Role)
 
 ```bash
-curl --location 'http://localhost:8080/products' \
+curl --location 'http://localhost:8080/products?pageNumber=2&pageSize=5' \
 --header "Authorization: Bearer $TOKEN"
 ```
-
----
+--
 
 ## Get Product By ID (VIEW / EDIT Role)
 

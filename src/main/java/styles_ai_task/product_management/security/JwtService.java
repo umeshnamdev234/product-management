@@ -108,7 +108,7 @@ public class JwtService {
 				.expiration(
 						new Date(
 								System.currentTimeMillis()
-										+ 86400000))
+										+ 86400000)) // For 24 Hours
 
 				// Sign token using secret key
 				.signWith(key)

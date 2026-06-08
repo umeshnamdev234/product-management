@@ -24,8 +24,7 @@ public class AuthService {
     /**
      * Common error message returned when authentication fails.
      */
-    private static final String INVALID_CREDENTIALS =
-            "Invalid username or password";
+    private static final String INVALID_CREDENTIALS = "Invalid username or password";
 
     /**
      * Repository used to retrieve user information from database.

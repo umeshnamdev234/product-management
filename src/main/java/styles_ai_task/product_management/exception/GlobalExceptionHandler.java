@@ -40,25 +40,26 @@ public class GlobalExceptionHandler {
      * Handles bean validation failures.
      *
      * Triggered when a request body annotated with
+     * 
      * @Valid fails validation constraints such as:
-     * - @NotBlank
-     * - @NotNull
-     * - @Positive
-     * - @Min
+     *        - @NotBlank
+     *        - @NotNull
+     *        - @Positive
+     *        - @Min
      *
-     * Example:
-     * {
-     *   "name": ""
-     * }
+     *        Example:
+     *        {
+     *        "name": ""
+     *        }
      *
-     * Response:
-     * {
-     *   "code": "INVALID_REQUEST",
-     *   "message": "Validation failed",
-     *   "errors": {
-     *      "name": "Product name is required"
-     *   }
-     * }
+     *        Response:
+     *        {
+     *        "code": "INVALID_REQUEST",
+     *        "message": "Validation failed",
+     *        "errors": {
+     *        "name": "Product name is required"
+     *        }
+     *        }
      *
      * @param ex validation exception
      * @return 400 Bad Request response
@@ -89,7 +90,7 @@ public class GlobalExceptionHandler {
      *
      * Examples:
      * {
-     *   "price": "abc"
+     * "price": "abc"
      * }
      *
      * When Spring cannot deserialize the request body,
@@ -97,8 +98,8 @@ public class GlobalExceptionHandler {
      *
      * Response:
      * {
-     *   "code": "INVALID_REQUEST",
-     *   "message": "Invalid value provided for field 'price'"
+     * "code": "INVALID_REQUEST",
+     * "message": "Invalid value provided for field 'price'"
      * }
      *
      * @param ex JSON parsing exception
@@ -217,8 +218,8 @@ public class GlobalExceptionHandler {
      *
      * Response:
      * {
-     *   "code": "ACCESS_DENIED",
-     *   "message": "You do not have permission to perform this action"
+     * "code": "ACCESS_DENIED",
+     * "message": "You do not have permission to perform this action"
      * }
      *
      * @param ex authorization exception

@@ -1,0 +1,25 @@
+INSERT INTO users (
+    id,
+    username,
+    password,
+    role
+)
+VALUES
+(
+    gen_random_uuid(),
+    'admin',
+    '$2a$10$7H4mDlM8IEfKhliaY43ocO09kJLqbGnYVpliMFIs4N2L1yWPyL8MS',
+    'EDIT'
+),
+(
+    gen_random_uuid(),
+    'editor',
+    '$2a$10$7H4mDlM8IEfKhliaY43ocO09kJLqbGnYVpliMFIs4N2L1yWPyL8MS',
+    'EDIT'
+),
+(
+    gen_random_uuid(),
+    'viewer',
+    '$2a$10$7H4mDlM8IEfKhliaY43ocO09kJLqbGnYVpliMFIs4N2L1yWPyL8MS',
+    'VIEW'
+);

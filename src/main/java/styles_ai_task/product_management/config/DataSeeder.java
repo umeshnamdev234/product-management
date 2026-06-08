@@ -94,7 +94,6 @@ public class DataSeeder implements CommandLineRunner {
                 .role(role)
                 .build();
 
-        // Save user in database
         userRepository.save(user);
 
         // Log created user

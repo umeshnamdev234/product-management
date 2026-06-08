@@ -32,9 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * A lightweight test controller is created specifically
  * to trigger exceptions and validate handler behavior.
  */
-@WebMvcTest(
-        controllers = GlobalExceptionHandlerTest.TestController.class
-)
+@WebMvcTest(controllers = GlobalExceptionHandlerTest.TestController.class)
 @Import({
         GlobalExceptionHandler.class,
         GlobalExceptionHandlerTest.TestController.class
@@ -87,8 +85,7 @@ class GlobalExceptionHandlerTest {
             throw new BusinessException(
                     "PRODUCT_NOT_FOUND",
                     "Product not found",
-                    HttpStatus.NOT_FOUND.value()
-            );
+                    HttpStatus.NOT_FOUND.value());
         }
 
         /**
@@ -101,8 +98,7 @@ class GlobalExceptionHandlerTest {
         public String accessDenied() {
 
             throw new AuthorizationDeniedException(
-                    "Access Denied"
-            );
+                    "Access Denied");
         }
 
         /**
@@ -115,8 +111,7 @@ class GlobalExceptionHandlerTest {
         public String internalError() {
 
             throw new RuntimeException(
-                    "Unexpected error"
-            );
+                    "Unexpected error");
         }
     }
 

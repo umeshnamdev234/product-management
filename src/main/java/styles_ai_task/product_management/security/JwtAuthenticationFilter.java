@@ -33,23 +33,23 @@ import java.util.List;
  * Flow:
  *
  * Client Request
- *       |
- *       v
+ * |
+ * v
  * JwtAuthenticationFilter
- *       |
- *       v
+ * |
+ * v
  * Extract JWT
- *       |
- *       v
+ * |
+ * v
  * Validate Token
- *       |
- *       v
+ * |
+ * v
  * Extract Username & Role
- *       |
- *       v
+ * |
+ * v
  * Set Authentication
- *       |
- *       v
+ * |
+ * v
  * Controller Access
  *
  * Since this application is stateless, authentication
@@ -60,133 +60,129 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    /**
-     * Service responsible for JWT operations such as:
-     * - Extracting username
-     * - Extracting role
-     * - Validating token
-     */
-    private final JwtService jwtService;
+	/**
+	 * Service responsible for JWT operations such as:
+	 * - Extracting username
+	 * - Extracting role
+	 * - Validating token
+	 */
+	private final JwtService jwtService;
 
-    /**
-     * Executes once for every incoming request.
-     *
-     * Steps:
-     * 1. Read Authorization header.
-     * 2. Verify Bearer token exists.
-     * 3. Extract JWT token.
-     * 4. Read username and role from token.
-     * 5. Create Authentication object.
-     * 6. Store authentication in SecurityContext.
-     * 7. Continue filter chain.
-     *
-     * @param request incoming HTTP request
-     * @param response outgoing HTTP response
-     * @param filterChain remaining filters in chain
-     * @throws ServletException servlet exception
-     * @throws IOException I/O exception
-     */
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+	/**
+	 * Executes once for every incoming request.
+	 *
+	 * Steps:
+	 * 1. Read Authorization header.
+	 * 2. Verify Bearer token exists.
+	 * 3. Extract JWT token.
+	 * 4. Read username and role from token.
+	 * 5. Create Authentication object.
+	 * 6. Store authentication in SecurityContext.
+	 * 7. Continue filter chain.
+	 *
+	 * @param request     incoming HTTP request
+	 * @param response    outgoing HTTP response
+	 * @param filterChain remaining filters in chain
+	 * @throws ServletException servlet exception
+	 * @throws IOException      I/O exception
+	 */
+	@Override
+	protected void doFilterInternal(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			FilterChain filterChain) throws ServletException, IOException {
 
-        /**
-         * Read Authorization header.
-         *
-         * Example:
-         * Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
-         */
-        String authHeader = request.getHeader("Authorization");
+		/**
+		 * Read Authorization header.
+		 *
+		 * Example:
+		 * Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+		 */
+		String authHeader = request.getHeader("Authorization");
 
-        /**
-         * Skip authentication if:
-         * - Header is missing
-         * - Header does not start with "Bearer "
-         *
-         * Request continues without authentication.
-         */
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+		/**
+		 * Skip authentication if:
+		 * - Header is missing
+		 * - Header does not start with "Bearer "
+		 *
+		 * Request continues without authentication.
+		 */
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-        /**
-         * Remove "Bearer " prefix and extract JWT token.
-         */
-        String token = authHeader.substring(7);
+		/**
+		 * Remove "Bearer " prefix and extract JWT token.
+		 */
+		String token = authHeader.substring(7);
 
-        try {
+		try {
 
-            /**
-             * Extract username from JWT payload.
-             *
-             * Example:
-             * admin
-             */
-            String username = jwtService.extractUsername(token);
+			/**
+			 * Extract username from JWT payload.
+			 *
+			 * Example:
+			 * admin
+			 */
+			String username = jwtService.extractUsername(token);
 
-            /**
-             * Extract role/authority from JWT payload.
-             *
-             * Example:
-             * VIEW
-             * EDIT
-             */
-            String role = jwtService.extractRole(token);
+			/**
+			 * Extract role/authority from JWT payload.
+			 *
+			 * Example:
+			 * VIEW
+			 * EDIT
+			 */
+			String role = jwtService.extractRole(token);
 
-            /**
-             * Create authenticated user object.
-             *
-             * principal    -> username
-             * credentials  -> null (password not required)
-             * authorities  -> user role
-             */
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            username,
-                            null,
-                            List.of(
-                                    new SimpleGrantedAuthority(role)
-                            )
-                    );
+			/**
+			 * Create authenticated user object.
+			 *
+			 * principal -> username
+			 * credentials -> null (password not required)
+			 * authorities -> user role
+			 */
+			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+					username,
+					null,
+					List.of(
+							new SimpleGrantedAuthority(role)));
 
-            /**
-             * Store authentication information inside
-             * Spring Security Context.
-             *
-             * After this point:
-             *
-             * @PreAuthorize(...)
-             * SecurityContextHolder
-             * Authentication
-             *
-             * can access the authenticated user.
-             */
-            SecurityContextHolder.getContext()
-                    .setAuthentication(authentication);
+			/**
+			 * Store authentication information inside
+			 * Spring Security Context.
+			 *
+			 * After this point:
+			 *
+			 * @PreAuthorize(...)
+			 * SecurityContextHolder
+			 * Authentication
+			 *
+			 * can access the authenticated user.
+			 */
+			SecurityContextHolder.getContext()
+					.setAuthentication(authentication);
 
-        } catch (Exception ignored) {
+		} catch (Exception ignored) {
 
-            /**
-             * Invalid or expired token.
-             *
-             * Authentication is not set.
-             * Request proceeds as anonymous user.
-             *
-             * Protected endpoints will later return:
-             * 401 Unauthorized
-             * or
-             * 403 Forbidden
-             */
-        }
+			/**
+			 * Invalid or expired token.
+			 *
+			 * Authentication is not set.
+			 * Request proceeds as anonymous user.
+			 *
+			 * Protected endpoints will later return:
+			 * 401 Unauthorized
+			 * or
+			 * 403 Forbidden
+			 */
+		}
 
-        /**
-         * Continue processing remaining filters
-         * and eventually reach the controller.
-         */
-        filterChain.doFilter(request, response);
-    }
+		/**
+		 * Continue processing remaining filters
+		 * and eventually reach the controller.
+		 */
+		filterChain.doFilter(request, response);
+	}
 }

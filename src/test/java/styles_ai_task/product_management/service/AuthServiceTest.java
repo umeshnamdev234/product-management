@@ -107,8 +107,7 @@ class AuthServiceTest {
 
         assertEquals(
                 "jwt-token",
-                response.getToken()
-        );
+                response.getToken());
 
         verify(userRepository, times(1))
                 .findByUsername("admin");
@@ -137,16 +136,13 @@ class AuthServiceTest {
         when(userRepository.findByUsername("invalid"))
                 .thenReturn(Optional.empty());
 
-        BusinessException exception =
-                assertThrows(
-                        BusinessException.class,
-                        () -> authService.login(request)
-                );
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> authService.login(request));
 
         assertEquals(
                 "INVALID_CREDENTIALS",
-                exception.getErrorCode()
-        );
+                exception.getErrorCode());
 
         verify(jwtService, never())
                 .generateToken(anyString(), anyString());
@@ -180,16 +176,13 @@ class AuthServiceTest {
                 "encodedPassword"))
                 .thenReturn(false);
 
-        BusinessException exception =
-                assertThrows(
-                        BusinessException.class,
-                        () -> authService.login(request)
-                );
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> authService.login(request));
 
         assertEquals(
                 "INVALID_CREDENTIALS",
-                exception.getErrorCode()
-        );
+                exception.getErrorCode());
 
         verify(jwtService, never())
                 .generateToken(anyString(), anyString());

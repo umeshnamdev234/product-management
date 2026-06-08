@@ -20,15 +20,9 @@ import java.util.UUID;
  * - Product image reference
  */
 @Entity
-@Table(
-        name = "products",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uk_product_name",
-                        columnNames = "name"
-                )
-        }
-)
+@Table(name = "products", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_product_name", columnNames = "name")
+})
 @Getter
 @Setter
 @Builder
@@ -48,39 +42,15 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    /**
-     * Product name.
-     *
-     * Must be unique across all products.
-     * Cannot be null.
-     */
     @Column(nullable = false)
     private String name;
 
-    /**
-     * Detailed product description.
-     *
-     * Maximum length: 1000 characters.
-     * Cannot be null.
-     */
     @Column(nullable = false, length = 1000)
     private String description;
 
-    /**
-     * Product price.
-     *
-     * Stored as BigDecimal to maintain
-     * precision for monetary values.
-     * Cannot be null.
-     */
     @Column(nullable = false)
     private BigDecimal price;
 
-    /**
-     * Available product stock quantity.
-     *
-     * Cannot be null.
-     */
     @Column(nullable = false)
     private Integer quantity;
 
